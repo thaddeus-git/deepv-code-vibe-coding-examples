@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 360px;
+            width: 100%;
+        }
+
+        .display {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: #2c3e50;
+            border: 2px solid #e9ecef;
+            overflow: hidden;
+            word-wrap: break-word;
+            text-align: right;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            font-size: 1.4rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-number {
+            background: #ffffff;
+            color: #2c3e50;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-number:hover {
+            background: #f8f9fa;
+            border-color: #dee2e6;
+        }
+
+        .btn-operator {
+            background: #667eea;
+            color: white;
+            border: 2px solid #667eea;
+        }
+
+        .btn-operator:hover {
+            background: #5a67d8;
+            border-color: #5a67d8;
+        }
+
+        .btn-equals {
+            background: #48bb78;
+            color: white;
+            border: 2px solid #48bb78;
+        }
+
+        .btn-equals:hover {
+            background: #38a169;
+            border-color: #38a169;
+        }
+
+        .btn-clear {
+            background: #f56565;
+            color: white;
+            border: 2px solid #f56565;
+        }
+
+        .btn-clear:hover {
+            background: #e53e3e;
+            border-color: #e53e3e;
+        }
+
+        .btn-special {
+            background: #ed8936;
+            color: white;
+            border: 2px solid #ed8936;
+        }
+
+        .btn-special:hover {
+            background: #dd6b20;
+            border-color: #dd6b20;
+        }
+
+        .btn-zero {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .display {
+                font-size: 2rem;
+                padding: 20px;
+            }
+            
+            .btn {
+                padding: 16px;
+                font-size: 1.2rem;
+                min-height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="btn btn-clear" onclick="clearAll()">AC</button>
+            <button class="btn btn-special" onclick="deleteLast()">DEL</button>
+            <button class="btn btn-operator" onclick="appendOperator('/')" data-key="/">÷</button>
+            <button class="btn btn-operator" onclick="appendOperator('*')" data-key="*">×</button>
+            
+            <button class="btn btn-number" onclick="appendNumber('7')" data-key="7">7</button>
+            <button class="btn btn-number" onclick="appendNumber('8')" data-key="8">8</button>
+            <button class="btn btn-number" onclick="appendNumber('9')" data-key="9">9</button>
+            <button class="btn btn-operator" onclick="appendOperator('-')" data-key="-">-</button>
+            
+            <button class="btn btn-number" onclick="appendNumber('4')" data-key="4">4</button>
+            <button class="btn btn-number" onclick="appendNumber('5')" data-key="5">5</button>
+            <button class="btn btn-number" onclick="appendNumber('6')" data-key="6">6</button>
+            <button class="btn btn-operator" onclick="appendOperator('+')" data-key="+">+</button>
+            
+            <button class="btn btn-number" onclick="appendNumber('1')" data-key="1">1</button>
+            <button class="btn btn-number" onclick="appendNumber('2')" data-key="2">2</button>
+            <button class="btn btn-number" onclick="appendNumber('3')" data-key="3">3</button>
+            <button class="btn btn-equals" onclick="calculate()" data-key="Enter" rowspan="2">=</button>
+            
+            <button class="btn btn-number btn-zero" onclick="appendNumber('0')" data-key="0">0</button>
+            <button class="btn btn-number" onclick="appendNumber('.')" data-key=".">.</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentInput = '0';
+        let operator = null;
+        let previousInput = null;
+        let justCalculated = false;
+
+        function updateDisplay() {
+            // 限制显示长度，避免溢出
+            if (currentInput.length > 12) {
+                display.textContent = parseFloat(currentInput).toExponential(6);
+            } else {
+                display.textContent = currentInput;
+            }
+        }
+
+        function appendNumber(number) {
+            if (justCalculated) {
+                currentInput = '0';
+                justCalculated = false;
+            }
+            
+            if (currentInput === '0' && number !== '.') {
+                currentInput = number;
+            } else if (number === '.' && currentInput.includes('.')) {
+                return; // 防止重复小数点
+            } else {
+                currentInput += number;
+            }
+            
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            if (justCalculated) {
+                justCalculated = false;
+            }
+            
+            if (operator !== null && previousInput !== null) {
+                calculate();
+            }
+            
+            operator = op;
+            previousInput = currentInput;
+            currentInput = '0';
+        }
+
+        function calculate() {
+            if (operator === null || previousInput === null) {
+                return;
+            }
+            
+            let prev = parseFloat(previousInput);
+            let current = parseFloat(currentInput);
+            let result;
+            
+            switch (operator) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    if (current === 0) {
+                        alert('错误：不能除以零！');
+                        clearAll();
+                        return;
+                    }
+                    result = prev / current;
+                    break;
+                default:
+                    return;
+            }
+            
+            // 处理结果精度
+            if (result % 1 === 0) {
+                currentInput = result.toString();
+            } else {
+                currentInput = result.toFixed(8).replace(/\.?0+$/, '');
+            }
+            
+            operator = null;
+            previousInput = null;
+            justCalculated = true;
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentInput = '0';
+            operator = null;
+            previousInput = null;
+            justCalculated = false;
+            updateDisplay();
+        }
+
+        function deleteLast() {
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
+            updateDisplay();
+        }
+
+        // 键盘输入支持
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            // 防止默认行为
+            if ('0123456789+-*/.='.includes(key) || key === 'Enter' || key === 'Escape' || key === 'Backspace') {
+                event.preventDefault();
+            }
+            
+            if ('0123456789.'.includes(key)) {
+                appendNumber(key);
+            } else if ('+-*/'.includes(key)) {
+                appendOperator(key);
+            } else if (key === 'Enter' || key === '=') {
+                calculate();
+            } else if (key === 'Escape') {
+                clearAll();
+            } else if (key === 'Backspace') {
+                deleteLast();
+            }
+        });
+
+        // 初始化显示
+        updateDisplay();
+    </script>
+</body>
+</html>

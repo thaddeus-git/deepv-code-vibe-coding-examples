@@ -1,7 +1,8 @@
 # Ignore large files and builds
 *.bin
 *.ggml  
-*.dmg
 build_objc/
 whisper.cpp/
 .DS_Store
+legacy/
+releases/
