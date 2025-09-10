@@ -1,0 +1,13 @@
+# Large binaries and models
+*.bin
+*.ggml
+whisper.cpp/build/
+whisper.cpp/models/
+build_objc/
+.DS_Store
+*.dmg
+
+# Keep source code and documentation
+!examples/*/src/
+!examples/*/README.md
+!examples/*/releases/*.dmg
