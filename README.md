@@ -1,14 +1,34 @@
 # DeepV Code Vibe - Coding Examples
 
-A curated list of practical coding examples organized by developer roles and scenarios.
+> Practical coding examples and templates for developers
 
-## Featured Examples
+## Contents
 
-- [Voice Input System](examples/desktop-developers/macos-native-builders/voice-input-system) - System-wide voice transcription for macOS
+- [macOS](#macos)
+- [Web](#web) 
+- [Mobile](#mobile)
+- [AI](#ai)
 
-## Desktop Developers
+## macOS
 
-### macOS Native Builders
+- [Voice Input System](macos/voice-input-system) - System-wide voice transcription. Hold Fn key to record, auto-paste anywhere.
 
-- [Voice Input System](examples/desktop-developers/macos-native-builders/voice-input-system) - Hold Fn key to record voice, auto-paste transcription anywhere on macOS
+## Web
 
+Coming soon...
+
+## Mobile
+
+Coming soon...
+
+## AI
+
+Coming soon...
+
+## Contributing
+
+Pull requests welcome!
+
+## License
+
+MIT
